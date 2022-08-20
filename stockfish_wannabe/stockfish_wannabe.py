@@ -60,42 +60,46 @@ class Chess:
         self.model.load_state_dict(torch.load(paramPath))
         self.chessBoard = c.Board()
         self.isBlack = True
-        self.depth = 15
+        self.depth = 2
         print(self.chessBoard.legal_moves)
         print("Done Initializing")
     
+
+    def makeMove(self, move):
+        self.chessBoard.push(move)
 
     def findBestMove(self, depth, isBlack):
         moveList = list(self.chessBoard.legal_moves)
         
 
-        if (depth == 0): # at a depth of zero, we return the eval, and none
+        if (depth == 0): # at a depth of zero, we return the eval, and no move
             return None, self.eval()
         
         # start by assuming that the first move in the list is the best
         bestMove = moveList[0]
-        self.chessBoardboard.push_san(moveList[0])
-        enemyMove, bestEval = self.bestMove(depth - 1, not isBlack) # find the best enemy response to the first move, and the eval it creates
+        self.chessBoard.push(moveList[0])
+        enemyMove, bestEval = self.findBestMove(depth - 1, not isBlack) # find the best enemy response to the first move, and the eval it creates
         self.chessBoard.pop()
 
-        for i in range(1, moveList):
-            self.chessBoard.push_san(moveList[i])
+        for i in range(1, len(moveList)):
+            self.chessBoard.push(moveList[i])
             nextEnemyMove, newEval = self.findBestMove(depth - 1, not isBlack)  # find the best enemy response to the first move, and the eval it creates
+            self.chessBoard.pop()
 
             if(isBlack) : # for black, find the lowest eval
                     if(newEval < bestEval):
-                        bestmove = moveList[i]
+                        bestMove = moveList[i]
                         bestEval = newEval
             else:
                 if(newEval > bestEval): # for white, find the highest eval
-                    bestmove = moveList[i]
+                    bestMove = moveList[i]
                     bestEval = newEval
             
         return bestMove, bestEval
     
 
     def eval(self):
-        input = getInputArray(self.chessBoard)
+        input = torch.tensor(getInputArray(self.chessBoard))
         ouput = self.model.forward(input)
         return self.largestIndex(ouput)
 
