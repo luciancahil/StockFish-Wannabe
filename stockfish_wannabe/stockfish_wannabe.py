@@ -52,26 +52,14 @@ class NeuralNet(nn.Module):
         out = self.l3(out) # runs the relu'd output of the 2nd hidden layer into the output layer
         return out
     
-model = NeuralNet(input_size, hidden_size, num_classes).to(device)
-
-board = c.Board()
-
-arr = torch.FloatTensor(getInputArray(board))
-
-
-
-paramPath = str(path) + "\\RandomParam.txt"
-model.load_state_dict(torch.load(paramPath))
-
 class Chess:
     def __init__(self):
         print("Initalizing")
-
-
-    def multiply(self, num1, num2):
-        output = model.forward(arr)
-        print(self.largestIndex(output))
-        return num1 * num2
+        self.model = NeuralNet(input_size, hidden_size, num_classes).to(device)
+        paramPath = str(path) + "\\RandomParam.txt"
+        self.model.load_state_dict(torch.load(paramPath))
+        self.chessBoard = c.Board()
+        print("Done Initializing")
     
 
     def largestIndex(self, arr):
@@ -91,4 +79,8 @@ class Chess:
         
 
         return largest
+
+    
+    def __str__(self):
+        print(str(self.chessBoard))
         
