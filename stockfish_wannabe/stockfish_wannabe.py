@@ -59,10 +59,68 @@ class Chess:
         paramPath = str(path) + "\\RandomParam.txt"
         self.model.load_state_dict(torch.load(paramPath))
         self.chessBoard = c.Board()
+        self.isBlack = False
+        print(self.chessBoard.legal_moves)
         print("Done Initializing")
     
+
+    def bestMove(self, depth, isBlack):
+        moveList = list(self.chessBoard.legal_moves)
+        
+
+        if (depth == 1): # at a depth of one, we use our neural network to evaluate moves, and give the one that is the best
+            bestMove = moveList[0]
+
+            # make the first move in the list, record the new eval, then undo the move
+            self.chessBoard.push_san(bestMove)
+            bestEval = self.eval()
+            self.chessBoard.pop()
+
+            
+            for i in range(1, len(moveList)):
+                self.chessBoard.push_san(moveList[i])
+                newEval = self.eval()
+                self.chessBoard.pop()
+
+                if(isBlack) : # for black, find the lowest eval
+                    if(newEval < bestEval):
+                        bestmove = moveList[i]
+                        bestEval = newEval
+                else:
+                    if(newEval > bestEval): # for white, find the highest eval
+                        bestmove = moveList[i]
+                        bestEval = newEval
+            
+            return bestMove, bestEval
+        
+        # start by assuming that the first move in the list is the best
+        bestmove = moveList[0]
+        self.chessBoardboard.push_san(bestMove)
+        enemyMove, bestEval = bestMove(depth - 1, not isBlack) # find the best enemy response to the first move, and the eval it creates
+        self.chessBoard.pop()
+
+        for i in range(1, moveList):
+            self.chessBoard.push_san(moveList[i])
+            nextEnemyMove, newEval = bestMove(depth - 1, not isBlack)
+
+            if(isBlack) : # for black, find the lowest eval
+                    if(newEval < bestEval):
+                        bestmove = moveList[i]
+                        bestEval = newEval
+            else:
+                if(newEval > bestEval): # for white, find the highest eval
+                    bestmove = moveList[i]
+                    bestEval = newEval
+            
+        return bestMove, bestEval
     
-    
+
+    def eval(self):
+        input = getInputArray(self.chessBoard)
+        ouput = self.model.forward(input)
+        return self.largestIndex(ouput)
+
+
 
     def largestIndex(self, arr):
         """
