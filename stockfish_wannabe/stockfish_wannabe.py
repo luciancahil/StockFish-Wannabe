@@ -59,7 +59,8 @@ class Chess:
         paramPath = str(path) + "\\RandomParam.txt"
         self.model.load_state_dict(torch.load(paramPath))
         self.chessBoard = c.Board()
-        self.isBlack = False
+        self.isBlack = True
+        self.depth = 15
         print(self.chessBoard.legal_moves)
         print("Done Initializing")
     
