@@ -1,3 +1,4 @@
+from logging import exception
 import chess as c
 
 import torch
@@ -75,6 +76,9 @@ class Chess:
         for move in moveArr:
             self.makeMove(move)
 
+    def takeBack(self):
+        self.chessBoard.pop()
+
     def findBestMove(self, depth, isBlack):
         moveList = list(self.chessBoard.legal_moves)
         
@@ -110,6 +114,44 @@ class Chess:
         ouput = self.model.forward(input)
         return self.largestIndex(ouput)
 
+    
+    def reset(self):
+        self.chessBoard.reset()
+    
+
+    def isGameOver(self):
+        return self.chessBoard.is_game_over()
+    
+    def resultString(self):
+        return None
+    
+    def playAs(self, color: str):
+        """
+        Sets the color that the player will be playing
+        Arguments:
+            color, either "w" for white or "b" for black
+        Throws:
+            An error if color is not a valid string
+        """
+        if(color.lower() != "b" and color.lower() != "w"):
+            raise exception("Invalid color")
+        
+        self.isBlack = color.lower == "w" 
+    
+    def gameMessage(self):
+        if(not self.chessBoard.is_game_over()):
+            return None
+        
+        result = self.chessBoard.outcome().result()
+
+        if(result == "1/2-1/2"):
+            return "DRAW"
+        elif(result == "1-0"):
+            return "WHITE won"
+        else:
+            return "BLACK won"
+
+        
 
 
     def largestIndex(self, arr):
@@ -132,5 +174,5 @@ class Chess:
 
     
     def __str__(self):
-        print(str(self.chessBoard))
+        return str(self.chessBoard)
         
