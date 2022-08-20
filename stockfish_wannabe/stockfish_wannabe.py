@@ -1,15 +1,36 @@
-import chess
+import chess as c
 
 import torch
 import torch.nn as nn
 import pathlib
 path = pathlib.Path(__file__).parent.resolve()
+from torch.utils.data import Dataset, DataLoader, TensorDataset
+
 
 # Hyper-parameters 
 input_size = 64 # number of squares
 hidden_size = 200 # number of pixels in hidden layer
 num_classes = 230
 device = torch.device('cpu')
+
+# Turns a board into a string with no spaces or newlines
+def getBoardString(board):
+    boardString = str(board)
+    boardString = boardString.replace(" ", "")
+    boardString = boardString.replace("\n", "")
+    return boardString
+
+# accepts a chessboardObject as an input, and outputs the input layer of our neural netwrok
+def getInputArray(board):
+    boardString = getBoardString(board)
+    array = [0] * 64
+    valueDict = {"." : 0, "P": 1/12, "p" : 2/12, "N": 3/12, "n": 4/12, "B" : 5/12, "b" : 6/12, "R": 7/12, "r" : 8/12, "Q": 9/12, "q" : 10/12, "K": 11/12, "k" : 12/12}
+
+    for i in range(64):
+        key = boardString[i]
+        array[i] = valueDict[key]
+    
+    return array
 
 
 # Fully connected neural network with one hidden layer
@@ -33,9 +54,41 @@ class NeuralNet(nn.Module):
     
 model = NeuralNet(input_size, hidden_size, num_classes).to(device)
 
+board = c.Board()
+
+arr = torch.FloatTensor(getInputArray(board))
+
+
+
 paramPath = str(path) + "\\RandomParam.txt"
 model.load_state_dict(torch.load(paramPath))
 
 class Chess:
-    def multiply(num1, num2):
+    def __init__(self):
+        print("Initalizing")
+
+
+    def multiply(self, num1, num2):
+        output = model.forward(arr)
+        print(self.largestIndex(output))
         return num1 * num2
+    
+
+    def largestIndex(self, arr):
+        """
+        Finds the index of the largest value in an array
+        Arguments:
+            arr: Array we are parsing
+        Returns:
+            The index of the largest value, or first occurence
+            if the largest occurs more than once
+        """
+        largest = 0
+
+        for i in range(1, len(arr)):
+            if(arr[i] > arr[largest]):
+                largest = i
+        
+
+        return largest
+        
