@@ -61,12 +61,19 @@ class Chess:
         self.chessBoard = c.Board()
         self.isBlack = True
         self.depth = 2
-        print(self.chessBoard.legal_moves)
         print("Done Initializing")
     
 
     def makeMove(self, move):
-        self.chessBoard.push(move)
+        self.chessBoard.push_san(move)
+    
+
+
+    def setup(self, moveString: str):
+        moveArr = moveString.split(",")
+
+        for move in moveArr:
+            self.makeMove(move)
 
     def findBestMove(self, depth, isBlack):
         moveList = list(self.chessBoard.legal_moves)
