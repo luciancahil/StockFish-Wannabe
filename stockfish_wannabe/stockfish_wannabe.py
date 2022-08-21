@@ -65,6 +65,9 @@ class Chess:
         print("Done Initializing")
     
     def play(self):
+        """
+        Allows the user to play against this program's chess engine from the current position.
+        """
         self.reset()
         done = False
 
@@ -127,20 +130,52 @@ class Chess:
     
 
     def makeMove(self, move):
+        """Inputs a move to the engine
+
+        Args:
+            move: A move to make in Standard Notateion (Ex: NF3)
+
+        Raises:
+            Value Error: If any string does not represent a legal series of ches moves
+        """
         self.chessBoard.push_san(move)
     
 
 
     def setup(self, moveString: str):
+        """Sets the board up to a starting position
+
+        Args:
+            moveString: A series of moves in SAN seperated by commas. For example, "e4,e5" will cause the position
+            the board to make the moves e4, then e5
+
+        Raises:
+            The best move, the evaluation if said move is made.
+        """
         moveArr = moveString.split(",")
 
         for move in moveArr:
             self.makeMove(move)
 
     def takeBack(self):
+        """
+        Undoes the last move made
+        """
         self.chessBoard.pop()
 
     def findBestMove(self, depth, isBlack):
+        """Find the best move in the current position.
+
+        Args:
+            depth: How many moves deep it should evaluate
+            isBlack: If true, the engien will try to find the best move for black. Otherwise, 
+            it will try to find the best move for white.
+        
+
+        Returns:
+            The best move in the current position, the evaluation if said move is played
+        """
+
         moveList = list(self.chessBoard.legal_moves)
         
 
@@ -171,16 +206,33 @@ class Chess:
     
 
     def eval(self):
+        """
+        Returns what the engines neural network thinks the evaluation of the position is
+        Returns:
+            A number between 0 and 229 inclusive. An evaluation n between 0 and 14 means 
+            mate for black in n moves. An evalation n between 15 and 214 inclusive means an 
+            evaluation of (n - 115) * 10 centipawns. An evaluation n between 215 and 229 inclusive
+            means mate for white in 229 - n moves. This evaluation sadly isn't very accurate.
+        """
         input = torch.tensor(getInputArray(self.chessBoard))
         ouput = self.model.forward(input)
         return self.largestIndex(ouput)
 
     
     def reset(self):
+        """
+        Resets the chessboard to the original starting position
+        """
         self.chessBoard.reset()
     
 
     def isGameOver(self):
+        """
+        Checks if the game is over.
+        Returns:
+            True if the game has ended, False otherwise
+        """
+        
         return self.chessBoard.is_game_over()
     
     def resultString(self):
@@ -189,10 +241,10 @@ class Chess:
     def playAs(self, color: str):
         """
         Sets the color that the player will be playing
-        Arguments:
+        Args:
             color, either "w" for white or "b" for black
-        Throws:
-            An error if color is not a valid string
+        Raises:
+            ValueError: When the provided color isn't a valid chess color.
         """
         if(color.lower() != "b" and color.lower() != "w"):
             raise ValueError("Invalid color")
@@ -200,6 +252,12 @@ class Chess:
         self.isBlack = color.lower() == "w" 
     
     def gameMessage(self):
+        """
+        Returns a message describing how the game ended, or None if the game isn't over
+        
+        Returns:
+            "WHITE won" if white has won, "BLACK won" if black has won, or "DRAW" if the game is drawn
+        """
         if(not self.chessBoard.is_game_over()):
             return None
         

@@ -1,5 +1,5 @@
 ==============
-Multiplication
+StockFish Wannabe
 ==============
 
 .. currentmodule:: stockfish_wannabe.stockfish_wannabe
