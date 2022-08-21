@@ -14,9 +14,9 @@ Welcome to StockFish Wannabe's documentation!
 :maxdepth: 2
 :caption: Python API:
 
-source/api/stockfish_wannabe
+A chess engine that uses a neural network trained on Stockfish Evaluations as its position evaluator.
 
-
+Was intended to be a demonstration of the capabilities of ANNs. Ended up being more a demonstration of their... limitations.
 
 Indices and tables
 ==================
