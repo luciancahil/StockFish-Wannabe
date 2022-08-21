@@ -1,4 +1,5 @@
-from stockfish_wannabe import Chess as chess
+from stockfish_wannabe import Chess
 
 
-print(chess.multiply(2.3, 6))  
+c = Chess()
+c.play()
