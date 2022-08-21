@@ -64,6 +64,67 @@ class Chess:
         self.depth = 2
         print("Done Initializing")
     
+    def play(self):
+        self.reset()
+        done = False
+
+        while(not done):
+            print("Hello!")
+            colorSet = False
+
+            while(not colorSet):
+                print("Would you like to play as (w)hite or (b)lack?")
+                color = input()
+                try:
+                    self.playAs(color)
+                except(ValueError):
+                    print("ERROR! Invalid Color.")
+                    continue
+
+                
+                colorSet = True
+
+            engineTurn = not self.isBlack
+
+            print("Begin!")
+
+            
+
+
+            while(not self.chessBoard.is_game_over()):
+                print(self.chessBoard)
+                nextMove = None
+
+                if(engineTurn):
+                    print("Thinking...")
+                    nextMove, eval = self.findBestMove(self.depth, self.isBlack)
+                    nextMove
+                    print(self.chessBoard.san(nextMove))
+                    self.chessBoard.push(nextMove)
+                else:
+                    print("please enter your next move:")
+                    
+                    moveSet = False
+
+                    while(not moveSet):
+                        nextMove = input()
+
+                        try:
+                            self.chessBoard.push_san(nextMove)
+                        except(ValueError):
+                            print("Error! Invalid move entered")
+                            continue
+
+                        moveSet = True
+                
+                engineTurn = not engineTurn
+   
+            
+            done = True
+            
+
+
+    
 
     def makeMove(self, move):
         self.chessBoard.push_san(move)
@@ -83,7 +144,7 @@ class Chess:
         moveList = list(self.chessBoard.legal_moves)
         
 
-        if (depth == 0): # at a depth of zero, we return the eval, and no move
+        if (depth == 0 or self.chessBoard.is_game_over()): # at a depth of zero, we return the eval, and no move
             return None, self.eval()
         
         # start by assuming that the first move in the list is the best
@@ -134,9 +195,9 @@ class Chess:
             An error if color is not a valid string
         """
         if(color.lower() != "b" and color.lower() != "w"):
-            raise exception("Invalid color")
+            raise ValueError("Invalid color")
         
-        self.isBlack = color.lower == "w" 
+        self.isBlack = color.lower() == "w" 
     
     def gameMessage(self):
         if(not self.chessBoard.is_game_over()):
